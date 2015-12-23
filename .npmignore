@@ -1,0 +1,9 @@
+scripts
+src
+test
+.babelrc
+.gitignore
+CHANGELOG.*
+karma.config.js
+README.*
+webpack.config.js
