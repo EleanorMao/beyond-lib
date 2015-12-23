@@ -29,7 +29,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/bestsuperdev/beyondlib.git"
+    "url": "git+https://github.com/bestsuperdev/beyond-lib.git"
   },
   "keywords": [
     "beyond"
@@ -40,7 +40,7 @@
   },
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/bestsuperdev/beyondlib/issues"
+    "url": "https://github.com/bestsuperdev/beyond-lib/issues"
   },
-  "homepage": "https://github.com/bestsuperdev/beyondlib#readme"
+  "homepage": "https://github.com/bestsuperdev/beyond-lib#readme"
 }
