@@ -3,10 +3,9 @@
 
 1. browser
 2. dateFormat
-3. eventHelper
-4. storage 
-5. url
-6. extend
+3. storage 
+4. url
+5. assign
 
 ## 安装
 ```
