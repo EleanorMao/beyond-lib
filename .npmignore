@@ -4,6 +4,6 @@ test
 .babelrc
 .gitignore
 CHANGELOG.*
-karma.config.js
+karma.conf.js
 README.*
 webpack.config.js
