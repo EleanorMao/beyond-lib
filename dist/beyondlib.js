@@ -56,16 +56,58 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 
+	var _require = __webpack_require__(1);
+
+	var encodeHTML = _require.encodeHTML;
+	var decodeHTML = _require.decodeHTML;
+
 	module.exports = {
-		assign: __webpack_require__(1),
-		browser: __webpack_require__(3),
-		dateFormat: __webpack_require__(4),
-		storage: __webpack_require__(5),
-		url: __webpack_require__(6)
+		assign: __webpack_require__(2),
+		browser: __webpack_require__(4),
+		dateFormat: __webpack_require__(5),
+		storage: __webpack_require__(6),
+		url: __webpack_require__(7),
+		namespace: __webpack_require__(8),
+		dateDiff: __webpack_require__(9),
+		klass: __webpack_require__(10),
+		encodeHTML: encodeHTML,
+		decodeHTML: decodeHTML
 	};
 
 /***/ },
 /* 1 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	var maps = {
+		'&': '&amp;',
+		'<': '&lt;',
+		'>': '&gt;',
+		'\"': '&quot;',
+		'\'': '&#039;'
+	};
+	var reverseMaps = {};
+	for (var k in maps) {
+		reverseMaps[maps[k]] = k;
+	}
+
+	exports.encodeHTML = function (html) {
+		html = '' + html;
+		return html.replace(/(&|<|>|'|")/g, function (match) {
+			return maps[match] || match;
+		});
+	};
+
+	exports.decodeHTML = function (str) {
+		str = '' + str;
+		return str.replace(/&amp;|&lt;|&gt;|&quot;|&#039;/g, function (match) {
+			return reverseMaps[match] || match;
+		});
+	};
+
+/***/ },
+/* 2 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -73,7 +115,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.constructor === Symbol ? "symbol" : typeof obj; }
 
 	//扩展函数，目前仅支持浅复制，会过滤原型字段
-	var toArray = __webpack_require__(2);
+	var toArray = __webpack_require__(3);
 	var assign = null;
 
 	if (typeof Object.assign === 'function') {
@@ -103,7 +145,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = assign;
 
 /***/ },
-/* 2 */
+/* 3 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -118,12 +160,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 3 */
+/* 4 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var assign = __webpack_require__(1);
+	var assign = __webpack_require__(2);
 	var defaults = {
 		name: 'unknow',
 		version: 'unknow',
@@ -219,7 +261,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = result;
 
 /***/ },
-/* 4 */
+/* 5 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -368,12 +410,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = dateFormat;
 
 /***/ },
-/* 5 */
+/* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var toArray = __webpack_require__(2);
+	var toArray = __webpack_require__(3);
 
 	var defaults = {
 		expire: 30,
@@ -462,12 +504,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 6 */
+/* 7 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var assign = __webpack_require__(1);
+	var assign = __webpack_require__(2);
 	var url = {};
 	function Url() {
 		this.protocol = null;
@@ -555,6 +597,421 @@ return /******/ (function(modules) { // webpackBootstrap
 		assign(url, parseUrl(window.location.href));
 	}
 	module.exports = url;
+
+/***/ },
+/* 8 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	/**
+	 * var app = {}
+	 * app.namespace = beyondlib.namespace
+	* app.namespace('mvc.Model',function(){
+	* 	return function(){}
+	* })
+	* app.namespace('mvc.model',function(){
+	* 	return {}
+	* })
+	* namespace(app,'xx.xx',function(){})
+	* 
+	* namespace string
+	* fn function/object
+	*   
+	*/
+	module.exports = function (obj, namespace, fn) {
+		var path,
+		    len = arguments.length;
+		if (len === 3) {
+			path = obj;
+		} else if (len === 2) {
+			fn = namespace;
+			namespace = obj;
+			path = this;
+		}
+		if (typeof namespace !== 'string') {
+			throw new TypeError('The namespace argument must be string');
+		}
+		if (namespace) {
+			namespace = namespace.replace(/^[\s\.]+|[\s\.]+$/, '').split('.');
+			for (var i = 0, length = namespace.length; i < length; i++) {
+				if (i < length - 1) {
+					if (path[namespace[i]] == null) {
+						path[namespace[i]] = {};
+					}
+					path = path[namespace[i]];
+				} else {
+					path[namespace[i]] = typeof fn === 'function' ? fn() : fn;
+				}
+			}
+		}
+	};
+
+/***/ },
+/* 9 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	/**
+	 * 如果 arg1 大于 arg2 ，则返回正数，否则返回负数，相等返回 0
+	 * dateDiff.seconds(arg1,arg2) => number
+	 * dateDiff.minutes(arg1,arg2) => number
+	 * dateDiff.hours(arg1,arg2) => number
+	 * dateDiff.weeks(arg1,arg2) => number
+	 * dateDiff.days(arg1,arg2) => number
+	 * dateDiff.months(arg1,arg2) => number
+	 * dateDiff.years(arg1,arg2) => number
+	 * 
+	 * dateDiff(arg1,arg2)  => {years , months , days , weeks ,hours ,minutes,seconds  }
+	 */
+	// var inArray('./utilities/inArray')
+
+	var dayMilliseconds = 86400000;
+
+	function isDate(date) {
+		return date && Object.prototype.toString.call(date) === '[object Date]';
+	}
+
+	function isTimestamp(timestamp) {
+		return typeof timestamp === 'number' && timestamp === timestamp;
+	}
+
+	function coverToDate(timestamp) {
+		if (isDate(timestamp)) {
+			return timestamp;
+		}
+		if (!isTimestamp(timestamp)) {
+			throw new TypeError('The first argument must be a number');
+		}
+		return new Date(timestamp);
+	}
+
+	function coverToTimestamp(date) {
+		if (isTimestamp(date)) {
+			return date;
+		}
+		if (!isDate(date)) {
+			throw new TypeError('The first argument must be a number');
+		}
+		return date.valueOf();
+	}
+
+	function years(arg1, arg2) {
+		var date1 = coverToDate(arg1);
+		var date2 = coverToDate(arg2);
+		return date1.getFullYear() - date2.getFullYear();
+	}
+
+	function months(arg1, arg2) {
+		var date1 = coverToDate(arg1);
+		var date2 = coverToDate(arg2);
+		var offsetYear = years(date1, date2);
+		return offsetYear * 12 + (date1.getMonth() - date2.getMonth());
+	}
+
+	function days(arg1, arg2) {
+		var date1 = coverToDate(arg1);
+		var date2 = coverToDate(arg2);
+		date1 = new Date(date1.getFullYear(), date1.getMonth(), date1.getDate());
+		date2 = new Date(date2.getFullYear(), date2.getMonth(), date2.getDate());
+		return (date1 - date2) / dayMilliseconds;
+	}
+
+	function hours(arg1, arg2) {
+		var timestamp1 = coverToTimestamp(arg1);
+		var timestamp2 = coverToTimestamp(arg2);
+		return Math.floor(timestamp1 / (1000 * 60 * 60)) - Math.floor(timestamp2 / (1000 * 60 * 60));
+	}
+
+	function minutes(arg1, arg2) {
+		var timestamp1 = coverToTimestamp(arg1);
+		var timestamp2 = coverToTimestamp(arg2);
+		return Math.floor(timestamp1 / (1000 * 60)) - Math.floor(timestamp2 / (1000 * 60));
+	}
+
+	function seconds(arg1, arg2) {
+		var timestamp1 = coverToTimestamp(arg1);
+		var timestamp2 = coverToTimestamp(arg2);
+		return Math.floor(timestamp1 / 1000) - Math.floor(timestamp2 / 1000);
+	}
+
+	module.exports = { years: years, months: months, days: days, hours: hours, minutes: minutes, seconds: seconds };
+
+/***/ },
+/* 10 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * var Parent = klass({
+	 *  foo : 1,
+	 *  bar : function(){return 0},
+	 * 	Mixins : [{
+	 * 		foo : function(){}
+	 * 	}],
+	 * 	Static : {
+	 * 	
+	 * 	}
+	 * 	constructor : function(){},
+	 * 		
+	 * })
+	 *
+	 * var Child = Parent.extend({
+	 *
+	 *  foo : 2,
+	 *  bar : function(){
+	 *  	return Child._super(this,'bar') + 1
+	 *  	return Child._super(this,arguments,'bar') + 1
+	 *  },
+	 * 	constructor(){
+	 * 		Child._super(arguments)
+	 * 	}
+	 * })
+	 *
+	 * var Leaf = Child.extend({
+	 * 	constructor(){
+	 * 		Leaf._super(this)
+	 * 		Leaf._super(this,arguments)
+	 * 	},
+	 * 	bar : function(){
+	 * 		return Leaf._super(this,arguments,'bar') + 1
+	 * 		return Leaf._super(this,arguments,'bar') + 1
+	 * 	}
+	 * })
+	 */
+
+	/**
+	 * 没有定义构造函数，存在继承的话，则自动调用父类构造函数，不存在继承，则赋值为空的函数noop
+	 * @param  {Object(Static,)} options [description]
+	 * @return {Object}  {methods,fields,constructor,mixins,static}
+	 */
+	'use strict';
+
+	function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.constructor === Symbol ? "symbol" : typeof obj; }
+
+	var _require = __webpack_require__(11);
+
+	var warn = _require.warn;
+
+	var assign = __webpack_require__(2);
+	var noop = __webpack_require__(12);
+	var each = __webpack_require__(13);
+	var toArray = __webpack_require__(3);
+
+	function parseOptions(options) {
+		var Static = options.Static || {};
+		var Mixins = options.Mixins || [];
+		var constructor = options.hasOwnProperty('constructor') && typeof options.constructor === 'function' ? options.constructor : null;
+		var fields = {},
+		    methods = {};
+		for (var key in options) {
+			var value = options[key];
+			if (key === 'Static' || key === 'Mixins' || key === 'constructor') {
+				continue;
+			}
+			if (typeof value === 'function') {
+				methods[key] = value;
+			} else {
+				fields[key] = value;
+				if ((typeof value === 'undefined' ? 'undefined' : _typeof(value)) === 'object' && value != null) {
+					warn('Not recommend to set object type,includes Date , Object , Array etc on klass options,it may make program errors');
+				}
+			}
+		}
+		if (Static.extend || Static.parent) {
+			warn('Not recommend to set `extend` , `parent` , `_super`,`constructor` properties on klass Static options, extends would not work');
+		}
+		return { Static: Static, Mixins: Mixins, constructor: constructor, fields: fields, methods: methods };
+	}
+
+	function _super(context, args, method) {
+		var len = arguments.length;
+		if (len >= 3) {
+			args = toArray(arguments);
+		} else if (len === 2) {
+			if (typeof args === 'string') {
+				method = args;
+				args = [];
+			} else {
+				args = toArray(args);
+				method = 'constructor';
+			}
+		} else if (len === 1) {
+			method = 'constructor';
+			args = [];
+		} else {
+			throw new TypeError('The context argument must be add on _super');
+		}
+		if (typeof this !== 'function') {
+			throw new Error('_super should be call via a Klass');
+		}
+		if (method === 'constructor') {
+			this.parent.constructor.apply(context, args);
+		} else {
+			if (typeof this.parent.prototype[method] === 'function') {
+				this.parent.prototype[method].apply(context, args);
+			} else {
+				warn('method ' + method + ' does not define');
+			}
+		}
+	}
+
+	function extend(options) {
+		if (typeof this !== 'function') {
+			throw new Error('extend should be call via a Klass');
+		}
+		return createKlass(options, this);
+	}
+
+	function Temp() {}
+
+	function createKlass(options, Parent) {
+		options = options || {};
+		options = parseOptions(options);
+
+		//调用父类的构造函数
+		if (typeof Parent === 'function' && !options.constructor) {
+			options.constructor = Parent.constructor;
+		}
+
+		if (!options.constructor) {
+			options.constructor = noop;
+		}
+		//定义类
+		var Class = function Class() {
+			'use strict';
+
+			if (typeof window !== 'undefined' && this === window || this == null) {
+				throw new Error('The Class can not be called as a function');
+			}
+			Class._assignFields(this);
+			Class.constructor.apply(this, toArray(arguments));
+		};
+		//构造父类的原型
+		if (typeof Parent === 'function') {
+			Temp.prototype = Parent.prototype;
+			Class.prototype = new Temp();
+			Temp.prototype = null;
+		}
+		//定义mixins方法
+		each(options.Mixins, function (mixin) {
+			assign(Class.prototype, mixin);
+		});
+		//定义 方法
+		assign(Class.prototype, options.methods);
+		//定义静态属性
+		assign(Class, options.Static);
+		//klass内置方法定义
+		if (!options.Static.hasOwnProperty('extend')) {
+			Class.extend = extend;
+		}
+		if (!options.Static.hasOwnProperty('parent') && typeof Parent === 'function') {
+			Class.parent = Parent;
+		}
+		if (!options.Static.hasOwnProperty('_super')) {
+			Class._super = _super;
+		}
+		if (!options.Static.hasOwnProperty('constructor')) {
+			Class.constructor = options.constructor;
+		}
+		if (!options.Static._assignFields) {
+			Class._assignFields = function (context) {
+				if (this.parent && this.parent._assignFields) {
+					this.parent._assignFields(context);
+				}
+				assign(context, options.fields);
+			};
+		}
+
+		return Class;
+	}
+
+	function klass(options) {
+		return createKlass(options);
+	}
+	module.exports = klass;
+
+/***/ },
+/* 11 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var toArray = __webpack_require__(3);
+	var noop = __webpack_require__(12);
+
+	function bindMethod(method) {
+		if (typeof console !== 'undefined' && console[method]) {
+			if (console[method].apply) {
+				return function () {
+					console[method].apply(console, toArray(arguments));
+				};
+			} else {
+				return function () {
+					console[method](toArray(arguments));
+				};
+			}
+		}
+		return noop;
+	}
+
+	module.exports = bindMethod('log');
+
+	exports.warn = bindMethod('warn');
+
+	exports.error = bindMethod('error');
+
+/***/ },
+/* 12 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	module.exports = function () {};
+
+/***/ },
+/* 13 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var isArray = __webpack_require__(14);
+	module.exports = function (arr, cb) {
+		if (!isArray(arr)) {
+			throw new TypeError('The first parameter must be array');
+		}
+		if (typeof cb !== 'function') {
+			throw new TypeError('The second parameter must be function');
+		}
+		var result;
+		for (var i = 0, len = arr.length; i < len; i++) {
+			result = cb.call(arr, arr[i], i, arr);
+			if (result === false) {
+				break;
+			}
+		}
+	};
+
+/***/ },
+/* 14 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	var ObjectToString = Object.prototype.toString;
+	var isArray;
+	if (typeof Array.isArray === 'function') {
+		isArray = Array.isArray;
+	} else {
+		isArray = function (arr) {
+			if (!arr) {
+				return false;
+			}
+			return ObjectToString.call(arr) === '[object Array]';
+		};
+	}
+
+	module.exports = isArray;
 
 /***/ }
 /******/ ])
