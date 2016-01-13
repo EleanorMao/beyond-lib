@@ -1,3 +1,4 @@
+/*! beyondlib.js v0.5.2 2016.01.13 14:02:42 */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory();
@@ -774,7 +775,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * 		Leaf.upper(this,arguments)
 	 * 	},
 	 * 	bar : function(){
-	 * 		return Leaf.upper(this,arguments,'bar') + 1
+	 * 		return Leaf.upper(this,arguments) + 1
+	 * 		return Leaf.upper(this,'bar') + 1
 	 * 		return Leaf.upper(this,arguments,'bar') + 1
 	 * 	}
 	 * })
@@ -806,21 +808,23 @@ return /******/ (function(modules) { // webpackBootstrap
 		var fields = {},
 		    methods = {};
 		for (var key in options) {
-			var value = options[key];
-			if (key === 'Static' || key === 'Mixins' || key === 'constructor') {
-				continue;
-			}
-			if (typeof value === 'function') {
-				methods[key] = value;
-			} else {
-				fields[key] = value;
-				if ((typeof value === 'undefined' ? 'undefined' : _typeof(value)) === 'object' && value != null) {
-					warn('Not recommend to set object type,includes Date , Object , Array etc on klass options,it may make program errors');
+			if (options.hasOwnProperty(key)) {
+				var value = options[key];
+				if (key === 'Static' || key === 'Mixins' || key === 'constructor') {
+					continue;
+				}
+				if (typeof value === 'function') {
+					methods[key] = value;
+				} else {
+					fields[key] = value;
+					if ((typeof value === 'undefined' ? 'undefined' : _typeof(value)) === 'object' && value != null) {
+						warn('Not recommend to set object type,includes Date , Object , Array etc on klass options,it may make program errors');
+					}
 				}
 			}
 		}
 		if (Static.extend || Static.Parent || Static.upper || Static.hasOwnProperty('constructor') || Static.__AssignFields__) {
-			warn('Not recommend to set `extend` , `Parent` , `upper` , `constructor` , `__AssignFields__` properties on klass Static options, Klass may not work');
+			warn('Not recommend to set `extend` , `Parent` , `upper` , `constructor` and like `__XX__`  properties on klass Static options, Klass may not work');
 		}
 		return { Static: Static, Mixins: Mixins, constructor: constructor, fields: fields, methods: methods };
 	}
@@ -905,16 +909,16 @@ return /******/ (function(modules) { // webpackBootstrap
 		if (!options.Static.hasOwnProperty('extend')) {
 			Class.extend = extend;
 		}
-		if (options.Static.parent == null && typeof Parent === 'function') {
+		if (!options.Static.hasOwnProperty('parent') && typeof Parent === 'function') {
 			Class.Parent = Parent;
 		}
-		if (!('upper' in options.Static)) {
+		if (!options.Static.hasOwnProperty('upper')) {
 			Class.upper = upper;
 		}
 		if (!options.Static.hasOwnProperty('constructor')) {
 			Class.constructor = options.constructor;
 		}
-		if (!options.Static.__AssignFields__) {
+		if (!options.Static.hasOwnProperty('__AssignFields__')) {
 			Class.__AssignFields__ = function (context) {
 				if (this.Parent && this.Parent.__AssignFields__) {
 					this.Parent.__AssignFields__(context);
