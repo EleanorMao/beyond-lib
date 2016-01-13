@@ -1,4 +1,4 @@
-/*! beyondlib.js v0.5.2 2016.01.13 14:02:42 */
+/*! beyondlib.js v0.5.2 2016.01.13 14:08:42 */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory();
