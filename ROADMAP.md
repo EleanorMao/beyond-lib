@@ -12,6 +12,7 @@ validators
 	mobilephone
 	zipcode
 	中文
+	中文身份证
 	alpha
 	number
 	empty

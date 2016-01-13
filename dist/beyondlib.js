@@ -760,22 +760,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	 *
 	 *  foo : 2,
 	 *  bar : function(){
-	 *  	return Child._super(this,'bar') + 1
-	 *  	return Child._super(this,arguments,'bar') + 1
+	 *  	return Child.upper(this,'bar') + 1
+	 *  	return Child.upper(this,arguments,'bar') + 1
 	 *  },
 	 * 	constructor(){
-	 * 		Child._super(arguments)
+	 * 		Child.upper(arguments)
 	 * 	}
 	 * })
 	 *
 	 * var Leaf = Child.extend({
 	 * 	constructor(){
-	 * 		Leaf._super(this)
-	 * 		Leaf._super(this,arguments)
+	 * 		Leaf.upper(this)
+	 * 		Leaf.upper(this,arguments)
 	 * 	},
 	 * 	bar : function(){
-	 * 		return Leaf._super(this,arguments,'bar') + 1
-	 * 		return Leaf._super(this,arguments,'bar') + 1
+	 * 		return Leaf.upper(this,arguments,'bar') + 1
+	 * 		return Leaf.upper(this,arguments,'bar') + 1
 	 * 	}
 	 * })
 	 */
@@ -799,6 +799,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var toArray = __webpack_require__(3);
 
 	function parseOptions(options) {
+		options = options || {};
 		var Static = options.Static || {};
 		var Mixins = options.Mixins || [];
 		var constructor = options.hasOwnProperty('constructor') && typeof options.constructor === 'function' ? options.constructor : null;
@@ -818,16 +819,16 @@ return /******/ (function(modules) { // webpackBootstrap
 				}
 			}
 		}
-		if (Static.extend || Static.parent) {
-			warn('Not recommend to set `extend` , `parent` , `_super`,`constructor` properties on klass Static options, extends would not work');
+		if (Static.extend || Static.Parent || Static.upper || Static.hasOwnProperty('constructor') || Static.__AssignFields__) {
+			warn('Not recommend to set `extend` , `Parent` , `upper` , `constructor` , `__AssignFields__` properties on klass Static options, Klass may not work');
 		}
 		return { Static: Static, Mixins: Mixins, constructor: constructor, fields: fields, methods: methods };
 	}
 
-	function _super(context, args, method) {
+	function upper(context, args, method) {
 		var len = arguments.length;
 		if (len >= 3) {
-			args = toArray(arguments);
+			args = toArray(args);
 		} else if (len === 2) {
 			if (typeof args === 'string') {
 				method = args;
@@ -840,18 +841,18 @@ return /******/ (function(modules) { // webpackBootstrap
 			method = 'constructor';
 			args = [];
 		} else {
-			throw new TypeError('The context argument must be add on _super');
+			throw new TypeError('The context argument must be add on upper');
 		}
 		if (typeof this !== 'function') {
-			throw new Error('_super should be call via a Klass');
+			throw new Error('upper should be call via a Klass');
 		}
 		if (method === 'constructor') {
-			this.parent.constructor.apply(context, args);
+			return this.Parent.constructor.apply(context, args);
 		} else {
-			if (typeof this.parent.prototype[method] === 'function') {
-				this.parent.prototype[method].apply(context, args);
+			if (typeof this.Parent.prototype[method] === 'function') {
+				return this.Parent.prototype[method].apply(context, args);
 			} else {
-				warn('method ' + method + ' does not define');
+				throw new Error('method ' + method + ' does not define');
 			}
 		}
 	}
@@ -866,7 +867,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	function Temp() {}
 
 	function createKlass(options, Parent) {
-		options = options || {};
 		options = parseOptions(options);
 
 		//调用父类的构造函数
@@ -884,7 +884,7 @@ return /******/ (function(modules) { // webpackBootstrap
 			if (typeof window !== 'undefined' && this === window || this == null) {
 				throw new Error('The Class can not be called as a function');
 			}
-			Class._assignFields(this);
+			Class.__AssignFields__(this);
 			Class.constructor.apply(this, toArray(arguments));
 		};
 		//构造父类的原型
@@ -905,24 +905,23 @@ return /******/ (function(modules) { // webpackBootstrap
 		if (!options.Static.hasOwnProperty('extend')) {
 			Class.extend = extend;
 		}
-		if (!options.Static.hasOwnProperty('parent') && typeof Parent === 'function') {
-			Class.parent = Parent;
+		if (options.Static.parent == null && typeof Parent === 'function') {
+			Class.Parent = Parent;
 		}
-		if (!options.Static.hasOwnProperty('_super')) {
-			Class._super = _super;
+		if (!('upper' in options.Static)) {
+			Class.upper = upper;
 		}
 		if (!options.Static.hasOwnProperty('constructor')) {
 			Class.constructor = options.constructor;
 		}
-		if (!options.Static._assignFields) {
-			Class._assignFields = function (context) {
-				if (this.parent && this.parent._assignFields) {
-					this.parent._assignFields(context);
+		if (!options.Static.__AssignFields__) {
+			Class.__AssignFields__ = function (context) {
+				if (this.Parent && this.Parent.__AssignFields__) {
+					this.Parent.__AssignFields__(context);
 				}
 				assign(context, options.fields);
 			};
 		}
-
 		return Class;
 	}
 
