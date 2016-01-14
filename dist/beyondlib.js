@@ -1,4 +1,4 @@
-/*! beyondlib.js v0.5.2 2016.01.13 14:08:42 */
+/*! beyondlib.js v0.6.0 2016.01.14 14:04:00 */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory();
@@ -57,58 +57,20 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 
-	var _require = __webpack_require__(1);
-
-	var encodeHTML = _require.encodeHTML;
-	var decodeHTML = _require.decodeHTML;
-
 	module.exports = {
-		assign: __webpack_require__(2),
-		browser: __webpack_require__(4),
-		dateFormat: __webpack_require__(5),
-		storage: __webpack_require__(6),
-		url: __webpack_require__(7),
-		namespace: __webpack_require__(8),
-		dateDiff: __webpack_require__(9),
-		klass: __webpack_require__(10),
-		encodeHTML: encodeHTML,
-		decodeHTML: decodeHTML
+		assign: __webpack_require__(1),
+		browser: __webpack_require__(3),
+		dateFormat: __webpack_require__(4),
+		storage: __webpack_require__(5),
+		url: __webpack_require__(6),
+		namespace: __webpack_require__(7),
+		dateDiff: __webpack_require__(8),
+		klass: __webpack_require__(9),
+		htmlHelper: __webpack_require__(14)
 	};
 
 /***/ },
 /* 1 */
-/***/ function(module, exports) {
-
-	'use strict';
-
-	var maps = {
-		'&': '&amp;',
-		'<': '&lt;',
-		'>': '&gt;',
-		'\"': '&quot;',
-		'\'': '&#039;'
-	};
-	var reverseMaps = {};
-	for (var k in maps) {
-		reverseMaps[maps[k]] = k;
-	}
-
-	exports.encodeHTML = function (html) {
-		html = '' + html;
-		return html.replace(/(&|<|>|'|")/g, function (match) {
-			return maps[match] || match;
-		});
-	};
-
-	exports.decodeHTML = function (str) {
-		str = '' + str;
-		return str.replace(/&amp;|&lt;|&gt;|&quot;|&#039;/g, function (match) {
-			return reverseMaps[match] || match;
-		});
-	};
-
-/***/ },
-/* 2 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -116,7 +78,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.constructor === Symbol ? "symbol" : typeof obj; }
 
 	//扩展函数，目前仅支持浅复制，会过滤原型字段
-	var toArray = __webpack_require__(3);
+	var toArray = __webpack_require__(2);
 	var assign = null;
 
 	if (typeof Object.assign === 'function') {
@@ -146,7 +108,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = assign;
 
 /***/ },
-/* 3 */
+/* 2 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -161,12 +123,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 4 */
+/* 3 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var assign = __webpack_require__(2);
+	var assign = __webpack_require__(1);
 	var defaults = {
 		name: 'unknow',
 		version: 'unknow',
@@ -262,7 +224,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = result;
 
 /***/ },
-/* 5 */
+/* 4 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -356,10 +318,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		S: function S(match, date) {
 			return date.getMilliseconds();
 		},
-		u: function u(match, date) {
-			var day = date.getDay();
-			return day > 0 ? day : 7;
-		}
+		u: 'getDay'
 	},
 	    format_reg = null,
 	    format_code = [],
@@ -370,6 +329,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 	format_reg = new RegExp(format_code.join('|'), 'g');
+
+	function isDate(date) {
+		return Object.prototype.toString.call(date) === '[object Date]';
+	}
 
 	function expandDigit(number, digit) {
 		number = String(number);
@@ -386,9 +349,8 @@ return /******/ (function(modules) { // webpackBootstrap
 		}
 	}
 
-	function dateFormat(format_str, millisecond) {
-		var len = arguments.length,
-		    date;
+	function dateFormat(format_str, date) {
+		var len = arguments.length;
 		if (len === 0) {
 			format_str = default_format;
 			date = new Date();
@@ -401,7 +363,12 @@ return /******/ (function(modules) { // webpackBootstrap
 				format_str = default_format;
 			}
 		} else {
-			date = new Date(millisecond);
+			if (!isDate(date)) {
+				date = new Date(date);
+			}
+			if (typeof format_str !== 'string') {
+				throw new TypeError("Format_str must be string");
+			}
 		}
 		return format_str.replace(format_reg, function (match) {
 			return format(match, date);
@@ -411,12 +378,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = dateFormat;
 
 /***/ },
-/* 6 */
+/* 5 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var toArray = __webpack_require__(3);
+	var toArray = __webpack_require__(2);
 
 	var defaults = {
 		expire: 30,
@@ -505,13 +472,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 7 */
+/* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var assign = __webpack_require__(2);
-	var url = {};
+	var assign = __webpack_require__(1);
+
+	var ports = {
+		'https': 443,
+		'http': 80
+	};
+
 	function Url() {
 		this.protocol = null;
 		this.auth = null;
@@ -522,47 +494,62 @@ return /******/ (function(modules) { // webpackBootstrap
 		this.hostname = null;
 		this.hash = null;
 		this.search = null;
-		this.query = null;
+		this.query = {};
 		this.pathname = null;
-		this.href = null;
+		this.url = null;
+		this.origin = null;
 	}
 
-	function parseUrl(_url) {
-		var _urls, result, host, auth, i, path, search, query, hash;
+	function isBrowser() {
+		return typeof window !== 'undefined';
+	}
+
+	function parseUrl(url) {
+		var urls, result, host, auth, i, path, search, query, hash;
 		result = new Url();
-		if (!url) {
+		if (!url && isBrowser()) {
+			url = window.location.href;
+		}
+		if (url == null) {
 			return result;
 		}
-		//protocol fixed
-		if (_url.indexOf('//') === 0) _url = window.location.href.split('/')[0] + _url;else if (_url.indexOf('://') < 0) _url = window.location.href.split('://')[0] + '://' + _url;
+		result.url = url;
+
+		//protocol fixed,such as  //cdn.com/jquery.js
+		if (isBrowser()) {
+			if (url.indexOf('//') === 0) {
+				url = window.location.href.split('/')[0] + url;
+			} else if (url.indexOf('://') < 0) {
+				url = window.location.href.split('://')[0] + '://' + url;
+			}
+		}
 
 		//hash parse
-		result.hash = '';
-		if (0 <= (hash = _url.indexOf('#'))) {
-			result.hash = _url.substr(hash + 1);
-			_url = _url.substr(0, hash);
+		// result.hash = ''
+		if (0 <= (hash = url.indexOf('#'))) {
+			result.hash = url.substring(hash + 1);
+			url = url.substring(0, hash);
 		}
 
 		//search parse
-		result.query = {};
-		result.search = '';
-		if (0 <= (search = _url.indexOf('?'))) {
-			result.search = _url.substr(search);
-			_url = _url.substr(0, search);
-			search = result.search.substr(1).split('&');
-			for (i = search.length - 1; i >= 0; i--) {
-				query = search[i].split('=');
-				result.query[decodeURIComponent(query[0])] = decodeURIComponent(query[1]);
+		if (0 <= (search = url.indexOf('?'))) {
+			result.search = url.substring(search + 1);
+			url = url.substring(0, search);
+			if (result.search) {
+				search = result.search.split('&');
+				for (i = search.length - 1; i >= 0; i--) {
+					query = search[i].split('=');
+					result.query[decodeURIComponent(query[0])] = decodeURIComponent(query[1] || '');
+				}
 			}
 		}
 
 		//protocol parse
-		_urls = _url.split('/');
-		result.protocol = _urls[0];
-		result.href = _url;
+		urls = url.split('/');
+		result.protocol = urls[0].toLowerCase().replace(/:$/, '');
 
 		//host parse
-		host = _urls[2].split('@'); // auth host eg rob:abcd1234@www.domain.com:80
+		host = urls[2].split('@'); // auth host eg rob:abcd1234@www.domain.com:80
 
 		if (host.length === 1) {
 			result.host = host[0];
@@ -577,30 +564,38 @@ return /******/ (function(modules) { // webpackBootstrap
 		host = result.host.split(':');
 		if (host.length > 1) {
 			result.hostname = host[0];
-			result.port = host[1];
+			result.port = +host[1];
 		} else {
 			result.hostname = result.host;
-			result.port = result.protocol.toLowerCase() === 'https:' ? '443' : '80';
+			result.port = ports[result.protocol] || null;
 		}
 
 		//path parse
 		result.pathname = '';
-		path = _urls.slice(3);
+		path = urls.slice(3);
 		if (path.length > 0) {
 			result.pathname = '/' + path.join('/');
+		}
+
+		//origin
+
+		// result.origin = `${result.protocol || ''}://${result.host}`
+		result.origin = result.host;
+		if (result.protocol) {
+			result.origin = result.protocol + '://' + result.origin;
 		}
 		return result;
 	}
 
 	// module.exports = assign({ parse : parseUrl},parseUrl())
-	url = { parse: parseUrl };
+	var url = { parse: parseUrl };
 	if (typeof window !== 'undefined') {
 		assign(url, parseUrl(window.location.href));
 	}
 	module.exports = url;
 
 /***/ },
-/* 8 */
+/* 7 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -649,7 +644,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 9 */
+/* 8 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -740,7 +735,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = { years: years, months: months, days: days, hours: hours, minutes: minutes, seconds: seconds };
 
 /***/ },
-/* 10 */
+/* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -791,14 +786,14 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.constructor === Symbol ? "symbol" : typeof obj; }
 
-	var _require = __webpack_require__(11);
+	var _require = __webpack_require__(10);
 
 	var warn = _require.warn;
 
-	var assign = __webpack_require__(2);
-	var noop = __webpack_require__(12);
-	var each = __webpack_require__(13);
-	var toArray = __webpack_require__(3);
+	var assign = __webpack_require__(1);
+	var noop = __webpack_require__(11);
+	var each = __webpack_require__(12);
+	var toArray = __webpack_require__(2);
 
 	function parseOptions(options) {
 		options = options || {};
@@ -935,13 +930,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = klass;
 
 /***/ },
-/* 11 */
+/* 10 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var toArray = __webpack_require__(3);
-	var noop = __webpack_require__(12);
+	var toArray = __webpack_require__(2);
+	var noop = __webpack_require__(11);
 
 	function bindMethod(method) {
 		if (typeof console !== 'undefined' && console[method]) {
@@ -965,7 +960,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.error = bindMethod('error');
 
 /***/ },
-/* 12 */
+/* 11 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -973,12 +968,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = function () {};
 
 /***/ },
-/* 13 */
+/* 12 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var isArray = __webpack_require__(14);
+	var isArray = __webpack_require__(13);
 	module.exports = function (arr, cb) {
 		if (!isArray(arr)) {
 			throw new TypeError('The first parameter must be array');
@@ -996,7 +991,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 14 */
+/* 13 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -1015,6 +1010,38 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 	module.exports = isArray;
+
+/***/ },
+/* 14 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	var maps = {
+		'&': '&amp;',
+		'<': '&lt;',
+		'>': '&gt;',
+		'\"': '&quot;',
+		'\'': '&#039;'
+	};
+	var reverseMaps = {};
+	for (var k in maps) {
+		reverseMaps[maps[k]] = k;
+	}
+
+	exports.encodeHTML = function (html) {
+		html = '' + html;
+		return html.replace(/(&|<|>|'|")/g, function (match) {
+			return maps[match] || match;
+		});
+	};
+
+	exports.decodeHTML = function (str) {
+		str = '' + str;
+		return str.replace(/&amp;|&lt;|&gt;|&quot;|&#039;/g, function (match) {
+			return reverseMaps[match] || match;
+		});
+	};
 
 /***/ }
 /******/ ])

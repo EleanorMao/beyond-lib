@@ -86,10 +86,7 @@ var formats = {
 		S : function(match,date){
 			return date.getMilliseconds()
 		},
-		u : function(match,date){
-			var day = date.getDay()
-			return day > 0 ? day : 7
-		}
+		u : 'getDay'
 	},
 	format_reg = null,
 	format_code = [],
@@ -100,6 +97,10 @@ for(var k in formats){
 }
 
 format_reg = new RegExp(format_code.join('|'),'g')
+
+function isDate(date){
+	return Object.prototype.toString.call(date) === '[object Date]'
+}
 
 function expandDigit (number,digit) {
 	number = String(number)
@@ -116,8 +117,8 @@ function format (match,date) {
 	}
 }
 
-function dateFormat (format_str,millisecond) {
-	var len = arguments.length,date
+function dateFormat (format_str,date) {
+	var len = arguments.length
 	if(len === 0){
 		format_str = default_format
 		date = new Date()
@@ -130,7 +131,12 @@ function dateFormat (format_str,millisecond) {
 			format_str = default_format
 		}
 	}else{
-		date = new Date(millisecond)
+		if (!isDate(date)) {
+			date = new Date(date)
+		}
+		if (typeof format_str !== 'string') {
+			throw new TypeError("Format_str must be string")
+		}
 	}
 	return format_str.replace(format_reg,function  (match) {
 		return format(match,date)

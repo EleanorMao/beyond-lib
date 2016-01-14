@@ -1,4 +1,3 @@
-var {encodeHTML,decodeHTML} = require('./htmlHelper')
 module.exports = {
 	assign : require('./assign'),
 	browser : require('./browser'),
@@ -8,6 +7,5 @@ module.exports = {
 	namespace : require('./namespace'),
 	dateDiff : require('./dateDiff'),
 	klass : require('./klass'),
-	encodeHTML,
-	decodeHTML
+	htmlHelper : require('./htmlHelper')
 }

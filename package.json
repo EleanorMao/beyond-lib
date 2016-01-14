@@ -1,6 +1,6 @@
 {
   "name": "beyond-lib",
-  "version": "0.5.2",
+  "version": "0.6.0",
   "description": "beyond lib",
   "main": "lib/index.js",
   "scripts": {
@@ -32,7 +32,15 @@
     "url": "git+https://github.com/bestsuperdev/beyond-lib.git"
   },
   "keywords": [
-    "beyond"
+    "beyond",
+    "lib",
+    "date",
+    "htmlencode",
+    "namespace",
+    "klass",
+    "storage",
+    "url",
+    "assign"
   ],
   "author": {
     "name": "mingzepeng",

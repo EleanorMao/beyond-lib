@@ -1,6 +1,6 @@
 
 describe('encodeHTML', function() {
-	var encodeHTML = beyondlib.encodeHTML
+	var encodeHTML = beyondlib.htmlHelper.encodeHTML
 	it('should works', function() {
 		var html = '<a href="#">hello&\'quote\'</a>'
 		expect(encodeHTML(html)).toEqual('&lt;a href=&quot;#&quot;&gt;hello&amp;&#039;quote&#039;&lt;/a&gt;')
@@ -9,7 +9,7 @@ describe('encodeHTML', function() {
 });
 
 describe('decodeHTML', function() {
-	var decodeHTML = beyondlib.decodeHTML
+	var decodeHTML = beyondlib.htmlHelper.decodeHTML
 	it('should works', function() {
 		var str = '&lt;a href=&quot;#&quot;&gt;hello&amp;&#039;quote&#039;&lt;/a&gt;'
 		expect(decodeHTML(str)).toEqual('<a href="#">hello&\'quote\'</a>')

@@ -88,10 +88,10 @@
   		// player.play(song);
   		var date = new Date();
   		var day = '' + date.getDay()
-  		if (day == 0) day = '7'
   		expect(dateFormat('u', date.getTime())).toEqual(day);
   	});
   	it("should works well with unrelated letters", function() {
-  		expect(dateFormat('v V l L')).toEqual('v V l L');
+      var date = new Date(2007,0,01)
+  		expect(dateFormat('yyyyv V l L',date)).toEqual('2007v V l L');
   	});
   });
