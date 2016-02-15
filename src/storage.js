@@ -9,7 +9,7 @@ function getCookiePart(expire,path,domain,secure){
 	var result = []
 	if (typeof expire === 'number' && expire !== 0){
 		var d = new Date()
-		d.setDate(d.getDate() + expire)
+		d.setTime(d.getTime() + 24*60*60*1000*expire)
 		result.push('; expires=' + d.toGMTString())
 	}
 
@@ -31,7 +31,7 @@ function getCookie(key){
 }
 
 function setCookie(key,value,expire,path,domain,secure) {
-	expire = expire == null ? defaults.expire : parseInt(expire,10)
+	expire = expire == null ? defaults.expire : Number(expire)
 	path = path || defaults.path
 	document.cookie = encodeURIComponent(key) + '=' + encodeURIComponent(value) + getCookiePart(expire,path,domain,secure)
 }

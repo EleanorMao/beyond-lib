@@ -32,13 +32,21 @@ describe("localStorage", function() {
 
 describe('cookie', function() {
 	it('should has a cookie of cookie_key:cookie_value ', function() {
-		storage.setCookie('cookie_key', 'cookie_value');
+		storage.setCookie('cookie_key','cookie_value');
+		storage.setCookie('cookie_key2','cookie_value2',1);
+		storage.setCookie('cookie_key3','cookie_value3',0.5);
+		storage.setCookie('cookie_key4','cookie_value4',-1);
+		storage.setCookie('cookie_key5','cookie_value5',-0.5);
 		expect(storage.getCookie('cookie_key')).toEqual('cookie_value');
+		expect(storage.getCookie('cookie_key2')).toEqual('cookie_value2');
+		expect(storage.getCookie('cookie_key3')).toEqual('cookie_value3');
+		expect(storage.getCookie('cookie_key4')).toEqual(null);
+		expect(storage.getCookie('cookie_key5')).toEqual(null);
 	});
 	it('should has a cookie of cookie_key:null ', function() {
-		storage.setCookie('cookie_key2', 'cookie_value1');
-		storage.removeCookie('cookie_key2', 'cookie_value1');
-		expect(storage.getCookie('cookie_key2')).toEqual(null);
+		storage.setCookie('cookie_key6', 'cookie_value6');
+		storage.removeCookie('cookie_key6', 'cookie_value6');
+		expect(storage.getCookie('cookie_key6')).toEqual(null);
 	});
 
 });

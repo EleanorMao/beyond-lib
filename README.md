@@ -228,8 +228,9 @@ var storage = require('beyond-lib/lib/storage')
 storage.set('key',{value : 'value'})
 storage.get('key')
 
-//cookie
+//cookie,expire 单位为天
 storage.setCookie('key','value')
+storage.setCookie('key','value',expire,path,domain,secure)
 storage.getCookie('key')
 ```
 

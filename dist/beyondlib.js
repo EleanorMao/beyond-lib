@@ -1,4 +1,4 @@
-/*! beyondlib.js v0.6.0 2016.01.14 14:04:00 */
+/*! beyondlib.js v0.6.2 2016.02.15 19:13:58 */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory();
@@ -394,7 +394,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		var result = [];
 		if (typeof expire === 'number' && expire !== 0) {
 			var d = new Date();
-			d.setDate(d.getDate() + expire);
+			d.setTime(d.getTime() + 24 * 60 * 60 * 1000 * expire);
 			result.push('; expires=' + d.toGMTString());
 		}
 
@@ -417,7 +417,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 	function setCookie(key, value, expire, path, domain, secure) {
-		expire = expire == null ? defaults.expire : parseInt(expire, 10);
+		expire = expire == null ? defaults.expire : Number(expire);
 		path = path || defaults.path;
 		document.cookie = encodeURIComponent(key) + '=' + encodeURIComponent(value) + getCookiePart(expire, path, domain, secure);
 	}
