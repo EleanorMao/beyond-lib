@@ -135,7 +135,7 @@ function dateFormat (format_str,date) {
 			date = new Date(date)
 		}
 		if (typeof format_str !== 'string') {
-			throw new TypeError("Format_str must be string")
+			throw new TypeError('Format_str must be string')
 		}
 	}
 	return format_str.replace(format_reg,function  (match) {

@@ -232,6 +232,7 @@ storage.get('key')
 storage.setCookie('key','value')
 storage.setCookie('key','value',expire,path,domain,secure)
 storage.getCookie('key')
+storage.removeCookie('key')
 ```
 
 ### url

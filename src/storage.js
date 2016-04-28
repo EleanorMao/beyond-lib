@@ -7,7 +7,7 @@ var defaults = {
 
 function getCookiePart(expire,path,domain,secure){
 	var result = []
-	if (typeof expire === 'number' && expire !== 0){
+	if (typeof expire === 'number' && expire !== 0 && expire === expire){
 		var d = new Date()
 		d.setTime(d.getTime() + 24*60*60*1000*expire)
 		result.push('; expires=' + d.toGMTString())

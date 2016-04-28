@@ -1,4 +1,4 @@
-/*! beyondlib.js v0.6.2 2016.02.15 19:13:58 */
+/*! beyondlib.js v0.6.3 2016.04.28 16:08:02 */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory();
@@ -117,9 +117,19 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	module.exports = function (obj) {
 		if (!obj || !('length' in obj)) {
-			throw new TypeError('Can not convert first argument to Array');
+			throw new TypeError('Can not convert the argument to Array');
 		}
-		return ArraySlice.call(obj, 0);
+		try {
+			return ArraySlice.call(obj, 0);
+		} catch (e) {
+			//fix ie8 bug , eg not support for document.querySelectorAll
+			var len = obj.length;
+			var arr = Array(len);
+			for (var i = 0; i < len; i++) {
+				arr[i] = obj[i];
+			}
+			return arr;
+		}
 	};
 
 /***/ },
@@ -367,7 +377,7 @@ return /******/ (function(modules) { // webpackBootstrap
 				date = new Date(date);
 			}
 			if (typeof format_str !== 'string') {
-				throw new TypeError("Format_str must be string");
+				throw new TypeError('Format_str must be string');
 			}
 		}
 		return format_str.replace(format_reg, function (match) {
@@ -392,7 +402,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function getCookiePart(expire, path, domain, secure) {
 		var result = [];
-		if (typeof expire === 'number' && expire !== 0) {
+		if (typeof expire === 'number' && expire !== 0 && expire === expire) {
 			var d = new Date();
 			d.setTime(d.getTime() + 24 * 60 * 60 * 1000 * expire);
 			result.push('; expires=' + d.toGMTString());

@@ -1,7 +1,7 @@
 {
   "name": "beyond-lib",
-  "version": "0.6.2",
-  "description": "beyond lib",
+  "version": "0.6.4",
+  "description": "beyond lib assign cookie storage dateformat htmlencode htmldecode datediff",
   "main": "lib/index.js",
   "scripts": {
     "lint": "eslint ./src",
@@ -18,7 +18,7 @@
     "babel-preset-es2015": "^6.3.13",
     "eslint": "^1.10.3",
     "jasmine-core": "^2.2.0",
-    "karma": "^0.13.15",
+    "karma": "^0.13.22",
     "karma-chrome-launcher": "^0.2.2",
     "karma-firefox-launcher": "^0.1.4",
     "karma-ie-launcher": "^0.1.5",
